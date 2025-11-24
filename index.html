@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubTrack - Premium Subscription Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">SubTrack</div>
+            <div class="user-profile">
+                <button id="login-btn" class="btn-secondary" style="font-size: 14px; padding: 8px 16px;">Sign
+                    In</button>
+                <div id="user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+                    <span id="user-name" style="font-size: 14px; color: var(--text-secondary);"></span>
+                    <img id="user-avatar" src="" alt="Avatar" class="avatar">
+                    <button id="logout-btn"
+                        style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 12px;">(Logout)</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="summary-card">
+                <h2>Total Monthly Spending</h2>
+                <div class="amount-display">
+                    <span class="currency">$</span>
+                    <span id="total-amount">0.00</span>
+                </div>
+                <p class="subtitle">across <span id="sub-count">0</span> active subscriptions</p>
+            </section>
+
+            <section class="actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="add-sub-btn" class="btn-primary" style="flex: 2;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Add Subscription
+                </button>
+                <button id="view-catalog-btn" class="btn-secondary" style="flex: 1;">
+                    Catalog
+                </button>
+                <button id="reset-btn" class="btn-secondary"
+                    style="flex: 1; border-color: rgba(239,68,68,0.3); color: var(--danger-color);">
+                    Reset
+                </button>
+            </section>
+
+            <section class="subscriptions-list">
+                <h3>Your Subscriptions</h3>
+                <div id="sub-list-container" class="list-container">
+                    <!-- Subscriptions will be injected here -->
+                    <div class="empty-state" id="empty-state">
+                        <p>No subscriptions yet. Add one to get started!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Add Subscription Modal -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>New Subscription</h3>
+                    <button id="close-modal" class="close-btn">&times;</button>
+                </div>
+                <form id="add-sub-form">
+                    <div class="form-group" style="position: relative;">
+                        <label for="sub-name">Service Name</label>
+                        <input type="text" id="sub-name" placeholder="e.g. Netflix, Spotify" required
+                            autocomplete="off">
+                        <div id="suggestions-container" class="suggestions-dropdown hidden"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sub-amount">Amount</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="sub-amount" placeholder="0.00" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sub-frequency">Billing Cycle</label>
+                            <select id="sub-frequency">
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sub-renewal">Next Renewal (Optional)</label>
+                        <input type="date" id="sub-renewal">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Subscription</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Catalog Modal -->
+        <div id="catalog-modal-overlay" class="modal-overlay hidden">
+            <div class="modal" style="max-width: 600px; max-height: 80vh; display: flex; flex-direction: column;">
+                <div class="modal-header">
+                    <h3>Service Catalog</h3>
+                    <button id="close-catalog" class="close-btn">&times;</button>
+                </div>
+            </div>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+            <script src="services.js"></script>
+            <script type="module" src="app.js"></script>
+</body>
+
+</html>

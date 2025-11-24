@@ -1,0 +1,11 @@
+{
+  "name": "subscription-tracker",
+  "version": "1.0.0",
+  "description": "Subscription tracking application",
+  "scripts": {
+    "build": "rm -rf public && mkdir public && cp index.html detail.html app.js services.js style.css firebase-config.js public/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
