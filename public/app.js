@@ -42,11 +42,12 @@ const userName = document.getElementById('user-name');
 const userAvatar = document.getElementById('user-avatar');
 const logoutBtn = document.getElementById('logout-btn');
 
-// Encryption DOM Elements
-const encryptionSetupModal = document.getElementById('encryption-setup-modal');
-const encryptionSetupForm = document.getElementById('encryption-setup-form');
-const unlockModal = document.getElementById('unlock-modal');
-const unlockForm = document.getElementById('unlock-form');
+// Settings Modal DOM Elements
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModalOverlay = document.getElementById('settings-modal-overlay');
+const closeSettingsBtn = document.getElementById('close-settings');
+const catalogList = document.getElementById('catalog-list');
+const resetBtn = document.getElementById('reset-btn');
 
 // Encryption Helpers
 // Encryption Helpers
@@ -397,41 +398,6 @@ modalOverlay.addEventListener('click', (e) => {
 });
 addSubForm.addEventListener('submit', addSubscription);
 
-const resetBtn = document.getElementById('reset-btn');
-let resetTimeout;
-
-resetBtn.addEventListener('click', async () => {
-    if (resetBtn.textContent.trim() === 'Confirm Reset?') {
-        if (currentUser) {
-            // Delete all from Firestore
-            const batch = writeBatch(db);
-            subscriptions.forEach(sub => {
-                const docRef = doc(db, "users", currentUser.uid, "subscriptions", sub.id);
-                batch.delete(docRef);
-            });
-            await batch.commit();
-        } else {
-            localStorage.removeItem('subscriptions');
-        }
-
-        subscriptions = [];
-        render();
-        resetBtn.textContent = 'Reset';
-        resetBtn.style.color = 'var(--danger-color)';
-        clearTimeout(resetTimeout);
-    } else {
-        resetBtn.textContent = 'Confirm Reset?';
-        resetBtn.style.color = '#fff';
-        resetBtn.style.backgroundColor = 'var(--danger-color)';
-
-        resetTimeout = setTimeout(() => {
-            resetBtn.textContent = 'Reset';
-            resetBtn.style.color = 'var(--danger-color)';
-            resetBtn.style.backgroundColor = 'transparent';
-        }, 3000);
-    }
-});
-
 subNameInput.addEventListener('input', (e) => {
     showSuggestions(e.target.value);
 });
@@ -443,11 +409,15 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Catalog Modal Logic
-const catalogModalOverlay = document.getElementById('catalog-modal-overlay');
-const viewCatalogBtn = document.getElementById('view-catalog-btn');
-const closeCatalogBtn = document.getElementById('close-catalog');
-const catalogList = document.getElementById('catalog-list');
+// Settings Modal Logic
+function toggleSettingsModal(show) {
+    if (show) {
+        renderCatalog();
+        settingsModalOverlay.classList.remove('hidden');
+    } else {
+        settingsModalOverlay.classList.add('hidden');
+    }
+}
 
 function renderCatalog() {
     catalogList.innerHTML = '';
@@ -462,17 +432,57 @@ function renderCatalog() {
     });
 }
 
-viewCatalogBtn.addEventListener('click', () => {
-    renderCatalog();
-    catalogModalOverlay.classList.remove('hidden');
+settingsBtn.addEventListener('click', () => toggleSettingsModal(true));
+closeSettingsBtn.addEventListener('click', () => toggleSettingsModal(false));
+settingsModalOverlay.addEventListener('click', (e) => {
+    if (e.target === settingsModalOverlay) {
+        toggleSettingsModal(false);
+    }
 });
 
-closeCatalogBtn.addEventListener('click', () => {
-    catalogModalOverlay.classList.add('hidden');
-});
+// Reset functionality within settings modal
+let resetTimeout;
 
-catalogModalOverlay.addEventListener('click', (e) => {
-    if (e.target === catalogModalOverlay) {
-        catalogModalOverlay.classList.add('hidden');
+resetBtn.addEventListener('click', async () => {
+    if (resetBtn.textContent.includes('Confirm')) {
+        if (currentUser) {
+            // Delete all from Firestore
+            const batch = writeBatch(db);
+            subscriptions.forEach(sub => {
+                const docRef = doc(db, "users", currentUser.uid, "subscriptions", sub.id);
+                batch.delete(docRef);
+            });
+            await batch.commit();
+            localStorage.removeItem(`subscriptions_${currentUser.uid}`);
+        } else {
+            localStorage.removeItem('subscriptions');
+        }
+
+        subscriptions = [];
+        render();
+        resetBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Reset All Subscriptions
+        `;
+        clearTimeout(resetTimeout);
+        showToast('All subscriptions deleted');
+        toggleSettingsModal(false);
+    } else {
+        resetBtn.textContent = 'Click Again to Confirm';
+        resetBtn.style.background = 'var(--danger-color)';
+        resetBtn.style.color = 'white';
+
+        resetTimeout = setTimeout(() => {
+            resetBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Reset All Subscriptions
+            `;
+            resetBtn.style.background = 'transparent';
+            resetBtn.style.color = 'var(--danger-color)';
+        }, 3000);
     }
 });
